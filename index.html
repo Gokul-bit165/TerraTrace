@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ORBIT — Earth Observation Intelligence Workstation</title>
+<meta name="description" content="HEISENBUG / ORBIT — Evidence-first satellite intelligence workstation prototype (SIH26227)." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/layout.css" />
+<link rel="stylesheet" href="css/components.css" />
+<link rel="stylesheet" href="css/discovery.css" />
+<link rel="stylesheet" href="css/change-studio.css" />
+<link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ==================================================================
+       SIDEBAR
+       ================================================================== -->
+  <aside class="sidebar" aria-label="Primary navigation">
+    <div class="sidebar-header">
+      <p class="brand-mark">HEISENBUG<span>/ ORBIT</span></p>
+      <p class="brand-sub">EARTH OBSERVATION<br />INTELLIGENCE</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <p class="nav-group-label">COMMAND</p>
+        <button class="nav-item is-active" data-nav="mission" data-nav-label="Mission" type="button">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="8" cy="8" r="1.4" fill="currentColor"/>
+            <path d="M8 1.6V3.4M8 12.6V14.4M1.6 8H3.4M12.6 8H14.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          Mission
+        </button>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-group-label">DISCOVERY</p>
+        <button class="nav-item" data-nav="discover" data-nav-label="Discover" type="button">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M10.2 10.2L14 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          Discover
+        </button>
+        <button class="nav-item" data-nav="changes" data-nav-label="Changes" type="button">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 6.5L6 3.5H13.5V11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13 9.5L10 12.5H2.5V5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Changes
+        </button>
+        <button class="nav-item" data-nav="similar" data-nav-label="Similar Sites" type="button">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="5" cy="5.5" r="2.2" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="11.5" cy="5.5" r="2.2" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="8" cy="11.5" r="2.2" stroke="currentColor" stroke-width="1.3"/>
+          </svg>
+          Similar Sites
+        </button>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-group-label">OPERATIONS</p>
+        <button class="nav-item" data-nav="review" data-nav-label="Review" type="button">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <rect x="2.5" y="2.5" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M5 8L7 10L11 5.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Review
+        </button>
+        <button class="nav-item" data-nav="archive" data-nav-label="Archive" type="button">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <rect x="2.2" y="3" width="11.6" height="3" rx="0.8" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M3 6V11.5C3 12.3 3.7 13 4.5 13H11.5C12.3 13 13 12.3 13 11.5V6" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M6.5 8.5H9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          Archive
+        </button>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-group-label">SYSTEM</p>
+        <button class="nav-item" data-nav="provenance" data-nav-label="Provenance" type="button">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M8 2L13.5 4.2V8C13.5 11 11.2 13 8 14C4.8 13 2.5 11 2.5 8V4.2L8 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            <path d="M5.6 8L7.3 9.7L10.6 6.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Provenance
+        </button>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <p class="system-panel-label">LOCAL SYSTEM</p>
+      <div class="system-row">
+        <span class="system-row-key">INDEX</span>
+        <span class="system-row-value">128K SCENES</span>
+      </div>
+      <div class="system-row">
+        <span class="system-row-key">MODEL</span>
+        <span class="system-row-value is-ready">READY</span>
+      </div>
+      <div class="system-row">
+        <span class="system-row-key">NETWORK</span>
+        <span class="system-row-value">AIR-GAPPED</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================================================================
+       TOP STATUS BAR
+       ================================================================== -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-crumb" id="topbar-crumb">Mission / Command</span>
+    </div>
+
+    <div class="topbar-center" aria-label="System status">
+      <span class="status-pill">
+        <span class="status-dot is-pulsing" aria-hidden="true"></span>
+        AIR-GAPPED
+      </span>
+      <span class="status-pill">LOCAL INDEX READY</span>
+      <span class="status-pill">MODEL READY</span>
+    </div>
+
+    <div class="topbar-right">
+      <div class="topbar-clock" aria-label="Current date and time">
+        <span id="clock-date">21 SEP 2026</span>
+        <span class="clock-time" id="clock-time">11:42:08</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================================================================
+       MAIN WORKSPACE
+       ================================================================== -->
+  <main class="main">
+
+    <section class="page" id="page-mission" aria-labelledby="mission-heading">
+
+      <div class="hero">
+        <p class="eyebrow">MISSION SEARCH</p>
+        <h1 class="hero-heading" id="mission-heading">Ask the Archive.</h1>
+        <p class="hero-subheading">Search satellite imagery by meaning, place and time.</p>
+      </div>
+
+      <!-- Query composer -->
+      <form class="query-composer" id="query-form">
+        <svg class="query-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M12.7 12.7L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <label for="query-input" class="visually-hidden">Satellite intelligence query</label>
+        <input
+          type="text"
+          id="query-input"
+          class="query-input"
+          placeholder="Show newly built structures near a river in the last 2 years"
+          autocomplete="off"
+        />
+        <button type="button" class="btn-run" id="run-analysis-btn">
+          RUN ANALYSIS
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="14" height="14">
+            <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </form>
+
+      <!-- Mission presets -->
+      <div class="mission-presets">
+        <p class="section-label">TRY A MISSION</p>
+        <div class="chip-row" id="preset-row"></div>
+      </div>
+
+      <!-- Reference image options -->
+      <div class="reference-options">
+        <p class="section-label">OR SEARCH WITH CONTEXT</p>
+        <div class="reference-row">
+          <button class="btn-secondary" type="button" data-reference-action="drop-image">
+            <svg class="icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="2" y="2" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+              <circle cx="5.6" cy="6" r="1" fill="currentColor"/>
+              <path d="M2.5 11L6 8L8.5 10L11 7.5L13.5 10.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            DROP REFERENCE IMAGE
+          </button>
+          <button class="btn-secondary" type="button" data-reference-action="draw-aoi">
+            <svg class="icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 4L8 2L13 4.5V11.5L8 14L3 11.5V4Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+              <path d="M3 4L8 6.5M8 6.5L13 4.5M8 6.5V14" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/>
+            </svg>
+            DRAW AOI
+          </button>
+          <button class="btn-secondary" type="button" data-reference-action="saved-mission">
+            <svg class="icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M4 2.5H12V13.5L8 11L4 13.5V2.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            </svg>
+            USE SAVED MISSION
+          </button>
+        </div>
+      </div>
+
+      <!-- Interpretation panel: stepper + intent + statement -->
+      <section class="interpretation-panel" id="interpretation-panel" hidden aria-label="Query interpretation">
+        <div class="stepper" id="stepper" role="list"></div>
+
+        <div class="intent-section" id="intent-section">
+          <div class="intent-heading">
+            <h2 class="intent-title">SEARCH INTERPRETATION</h2>
+          </div>
+          <div class="intent-grid" id="intent-grid"></div>
+
+          <div class="semantic-statement" id="semantic-statement">
+            <p class="semantic-statement-label">SEMANTIC INTENT</p>
+            <p class="semantic-statement-text" id="statement-text"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Processing pipeline -->
+      <div class="pipeline-section">
+        <p class="section-label">PROCESSING PIPELINE</p>
+        <div class="pipeline" role="list" aria-label="Processing pipeline status">
+          <div class="pipeline-node" data-stage="query" role="listitem">
+            <span class="pipeline-marker"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="pipeline-label">QUERY</span>
+          </div>
+          <div class="pipeline-connector" data-index="0"></div>
+          <div class="pipeline-node" data-stage="intent" role="listitem">
+            <span class="pipeline-marker"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="pipeline-label">INTENT</span>
+          </div>
+          <div class="pipeline-connector" data-index="1"></div>
+          <div class="pipeline-node" data-stage="archive" role="listitem">
+            <span class="pipeline-marker"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="pipeline-label">ARCHIVE</span>
+          </div>
+          <div class="pipeline-connector" data-index="2"></div>
+          <div class="pipeline-node" data-stage="analysis" role="listitem">
+            <span class="pipeline-marker"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="pipeline-label">ANALYSIS</span>
+          </div>
+          <div class="pipeline-connector" data-index="3"></div>
+          <div class="pipeline-node" data-stage="evidence" role="listitem">
+            <span class="pipeline-marker"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="pipeline-label">EVIDENCE</span>
+          </div>
+        </div>
+
+        <div class="result-banner" id="result-banner">
+          <div>
+            <span class="result-count" id="result-count">87</span>
+            <p class="result-count-label">CANDIDATE LOCATIONS IDENTIFIED</p>
+          </div>
+          <button class="btn-primary" id="continue-discovery-btn" type="button">
+            CONTINUE TO DISCOVERY
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" width="14" height="14">
+              <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="page" id="page-discovery" hidden aria-labelledby="discovery-heading">
+
+      <p class="breadcrumb">COMMAND / DISCOVERY</p>
+
+      <div class="discovery-title-row">
+        <div>
+          <h1 class="discovery-heading" id="discovery-heading">Semantic Discovery</h1>
+          <p class="discovery-subheading">Search the archive by meaning, location and time.</p>
+        </div>
+        <div class="discovery-metrics">
+          <div class="metric-block">
+            <span class="metric-value" id="metric-candidates">87</span>
+            <span class="metric-label">CANDIDATES</span>
+          </div>
+          <div class="metric-block">
+            <span class="metric-value" id="metric-high-confidence">14</span>
+            <span class="metric-label">HIGH CONFIDENCE</span>
+          </div>
+          <div class="metric-block">
+            <span class="metric-value" id="metric-priority">3</span>
+            <span class="metric-label">PRIORITY</span>
+          </div>
+          <div class="metric-block">
+            <span class="metric-value">128K</span>
+            <span class="metric-label">INDEXED SCENES</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="query-context-bar">
+        <p class="query-context-label">QUERY CONTEXT</p>
+        <p class="query-context-text" id="discovery-query-text">"Show newly built structures near a river in the last 2 years"</p>
+      </div>
+
+      <div class="search-intent-strip">
+        <p class="section-label">SEARCH INTENT</p>
+        <div class="intent-strip-row">
+          <div class="intent-strip-item">
+            <span class="intent-strip-label">TARGET</span>
+            <span class="intent-strip-value" id="intent-strip-target">Construction</span>
+          </div>
+          <div class="intent-strip-item">
+            <span class="intent-strip-label">RELATION</span>
+            <span class="intent-strip-value" id="intent-strip-relation">Near water</span>
+          </div>
+          <div class="intent-strip-item">
+            <span class="intent-strip-label">TEMPORAL</span>
+            <span class="intent-strip-value" id="intent-strip-temporal">2024–2026</span>
+          </div>
+          <div class="intent-strip-item">
+            <span class="intent-strip-label">PERSISTENCE</span>
+            <span class="intent-strip-value" id="intent-strip-persistence">Required</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Retrieval entry animation -->
+      <div class="retrieval-loading" id="retrieval-loading" hidden aria-label="Retrieving results">
+        <div class="retrieval-steps" id="retrieval-steps"></div>
+      </div>
+
+      <!-- Main workspace: filters | map | results -->
+      <div class="discovery-workspace" id="discovery-workspace" hidden>
+
+        <aside class="discovery-panel filters-panel" id="filters-panel" aria-label="Refine search">
+          <div class="search-mode-toggle" role="tablist" aria-label="Search mode">
+            <button class="mode-btn is-active" type="button" data-mode="text" role="tab" aria-selected="true">TEXT SEARCH</button>
+            <button class="mode-btn" type="button" data-mode="image" role="tab" aria-selected="false">IMAGE SEARCH</button>
+          </div>
+
+          <div id="text-search-filters">
+            <h2 class="panel-title" style="margin-bottom: var(--space-4);">REFINE SEARCH</h2>
+
+            <div class="filter-section">
+              <p class="filter-section-label">TIME RANGE</p>
+              <div class="segmented">
+                <button type="button" class="is-active" data-year="2024">2024</button>
+                <button type="button" class="is-active" data-year="2025">2025</button>
+                <button type="button" class="is-active" data-year="2026">2026</button>
+              </div>
+            </div>
+
+            <div class="filter-section">
+              <p class="filter-section-label">SENSOR</p>
+              <label class="check-row"><input type="checkbox" data-sensor value="Sentinel-2" checked /> Sentinel-2</label>
+              <label class="check-row"><input type="checkbox" data-sensor value="Sentinel-1" checked /> Sentinel-1</label>
+              <label class="check-row"><input type="checkbox" data-sensor value="Landsat" /> Landsat</label>
+            </div>
+
+            <div class="filter-section">
+              <p class="filter-section-label">OBJECT</p>
+              <label class="check-row"><input type="checkbox" data-type value="construction" checked /> Structures</label>
+              <label class="check-row"><input type="checkbox" data-type value="road" /> Roads</label>
+              <label class="check-row"><input type="checkbox" data-type value="clearance" /> Cleared ground</label>
+              <label class="check-row"><input type="checkbox" data-type value="water" /> Water</label>
+            </div>
+
+            <div class="filter-section">
+              <p class="filter-section-label">PROXIMITY</p>
+              <label class="check-row"><input type="checkbox" id="filter-near-river" checked /> Near river</label>
+            </div>
+
+            <div class="filter-section">
+              <p class="filter-section-label">CLOUD QUALITY</p>
+              <div class="segmented">
+                <button type="button" data-cloud="10">&lt; 10%</button>
+                <button type="button" class="is-active" data-cloud="20">&lt; 20%</button>
+                <button type="button" data-cloud="40">&lt; 40%</button>
+              </div>
+            </div>
+
+            <div class="filter-section">
+              <div class="range-readout">
+                <p class="filter-section-label" style="margin-bottom:0;">CONFIDENCE</p>
+                <span class="readout-value" id="filter-confidence-value">70%</span>
+              </div>
+              <input type="range" class="range-slider" id="filter-confidence" min="0" max="100" step="5" value="70" aria-label="Minimum confidence" />
+            </div>
+
+            <div class="filter-section">
+              <button type="button" class="btn-reset" id="btn-reset-filters">RESET FILTERS</button>
+            </div>
+          </div>
+
+          <div id="image-search-panel" hidden>
+            <div class="image-dropzone" id="image-dropzone" role="button" tabindex="0">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.4"/>
+                <circle cx="8.5" cy="9" r="1.5" fill="currentColor"/>
+                <path d="M4 16L9 11L13 15L16 12L20 16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p class="dropzone-title">DROP REFERENCE IMAGE</p>
+              <p class="dropzone-sub">Search visually similar sites</p>
+            </div>
+
+            <p class="panel-title">SIMILARITY MODE</p>
+            <div class="chip-row">
+              <button class="chip" type="button" data-similarity="structural">STRUCTURAL</button>
+              <button class="chip" type="button" data-similarity="landscape">LANDSCAPE</button>
+              <button class="chip" type="button" data-similarity="semantic">SEMANTIC</button>
+            </div>
+          </div>
+        </aside>
+
+        <section class="discovery-panel map-panel" id="map-panel" aria-label="Discovery map">
+          <div class="map-header">
+            <span class="map-header-title">SATELLITE DISCOVERY</span>
+            <div class="layer-toggle" role="tablist" aria-label="Map layer">
+              <button class="layer-btn is-active" type="button" data-layer="optical" role="tab" aria-selected="true">OPTICAL</button>
+              <button class="layer-btn" type="button" data-layer="sar" role="tab" aria-selected="false">SAR</button>
+              <button class="layer-btn" type="button" data-layer="change" role="tab" aria-selected="false">CHANGE SIGNAL</button>
+            </div>
+            <div class="map-header-meta">
+              <span>SCENE COUNT <strong>128,442</strong></span>
+              <span>AOI <strong>12.8 km²</strong></span>
+            </div>
+          </div>
+
+          <div class="map-viewport" id="map-viewport" data-layer="optical">
+            <div class="map-viewport-scale" id="map-scale-layer">
+              <svg class="map-svg" id="map-svg" viewBox="0 0 800 600" preserveAspectRatio="none" aria-hidden="true"></svg>
+              <div class="map-markers" id="map-markers"></div>
+            </div>
+            <div class="map-north" aria-hidden="true">N<br />&#8593;</div>
+            <div class="map-scale" aria-hidden="true">
+              <span class="map-scale-bar"></span>
+              <span>2 km</span>
+            </div>
+            <div class="map-coords" id="map-coords">24.78° N, 92.94° E</div>
+          </div>
+        </section>
+
+        <aside class="discovery-panel results-panel" id="results-panel" aria-label="Ranked results">
+          <div class="results-header">
+            <h2 class="panel-title">RANKED RESULTS</h2>
+            <div class="view-toggle" role="tablist" aria-label="Result view">
+              <button class="view-btn is-active" type="button" data-view="list" role="tab" aria-selected="true">LIST VIEW</button>
+              <button class="view-btn" type="button" data-view="cluster" role="tab" aria-selected="false">CLUSTER VIEW</button>
+            </div>
+          </div>
+
+          <div class="sort-row">
+            <span class="sort-label">SORT BY</span>
+            <div class="sort-buttons">
+              <button class="sort-btn is-active" type="button" data-sort="relevance">RELEVANCE</button>
+              <button class="sort-btn" type="button" data-sort="confidence">CHANGE CONFIDENCE</button>
+              <button class="sort-btn" type="button" data-sort="recency">RECENCY</button>
+              <button class="sort-btn" type="button" data-sort="distance">DISTANCE</button>
+            </div>
+          </div>
+
+          <div class="results-list" id="results-list"></div>
+          <div class="cluster-list" id="cluster-list" hidden></div>
+
+          <div class="why-panel" id="why-panel">
+            <div id="why-content">
+              <div class="why-panel-header">
+                <span class="why-panel-title" id="why-site-id">HX-0147</span>
+                <span class="why-coords" id="why-coords-value">24.7802° N · 92.9376° E</span>
+              </div>
+
+              <div class="why-score-row">
+                <div class="score-block">
+                  <p class="score-label">SEMANTIC MATCH</p>
+                  <p class="score-value" id="why-semantic-score">94</p>
+                  <div class="score-bar"><div class="score-bar-fill" id="why-semantic-bar" style="width:94%"></div></div>
+                </div>
+                <div class="score-block">
+                  <p class="score-label">CHANGE CONFIDENCE</p>
+                  <p class="score-value" id="why-change-score">92</p>
+                  <div class="score-bar"><div class="score-bar-fill is-change" id="why-change-bar" style="width:92%"></div></div>
+                </div>
+              </div>
+
+              <div class="why-context-grid">
+                <div>
+                  <p class="why-context-label">TARGET</p>
+                  <p class="why-context-value" id="why-target">Structure</p>
+                </div>
+                <div>
+                  <p class="why-context-label">RELATION</p>
+                  <p class="why-context-value" id="why-relation">Near river</p>
+                </div>
+                <div>
+                  <p class="why-context-label">CONTEXT</p>
+                  <p class="why-context-value" id="why-context">Recent development</p>
+                </div>
+              </div>
+
+              <div class="why-columns">
+                <div class="why-column">
+                  <p class="why-column-title">SUPPORTING SIGNALS</p>
+                  <ul class="why-list" id="why-signals"></ul>
+                </div>
+                <div class="why-column">
+                  <p class="why-column-title">CONFOUNDERS</p>
+                  <ul class="why-list" id="why-confounders"></ul>
+                </div>
+              </div>
+
+              <div class="why-footer">
+                <span>SITE <span id="why-footer-type">Construction</span></span>
+                <span>EARLIEST SUPPORTED <span id="why-footer-date">Oct 2024</span></span>
+              </div>
+            </div>
+            <p class="empty-results" id="why-empty" hidden>Select a candidate to see why it matched.</p>
+          </div>
+        </aside>
+      </div>
+
+      <div class="retrieval-status-strip">
+        <span class="status-strip-item"><span class="status-dot is-pulsing" aria-hidden="true"></span>LOCAL ARCHIVE <strong>READY</strong></span>
+        <span class="status-strip-item">SEMANTIC INDEX <strong>READY</strong></span>
+        <span class="status-strip-item">SPATIAL INDEX <strong>READY</strong></span>
+        <span class="status-strip-item">TEMPORAL INDEX <strong>READY</strong></span>
+        <span class="status-strip-item is-metric">QUERY LATENCY <strong>1.82 s</strong></span>
+      </div>
+
+    </section>
+
+    <section class="page" id="page-changes" hidden aria-labelledby="change-heading">
+
+      <p class="breadcrumb" id="change-breadcrumb">DISCOVERY / SITE #0147 / CHANGE STUDIO</p>
+
+      <div class="change-title-row">
+        <div>
+          <h1 class="change-heading" id="change-heading">Temporal Change Studio</h1>
+          <p class="change-subheading">Reconstructing the site's observed evolution across time.</p>
+        </div>
+      </div>
+
+      <div class="change-site-strip">
+        <span class="change-site-id" id="change-site-id">#0147</span>
+        <div class="change-site-meta">
+          <span class="change-site-type" id="change-site-type">NEW CONSTRUCTION</span>
+          <span class="change-site-coords" id="change-site-coords">24.7802° N, 92.9376° E</span>
+        </div>
+        <div class="change-strip-spacer"></div>
+        <div class="change-strip-metric">
+          <span class="change-strip-metric-value" id="change-semantic-value">94%</span>
+          <span class="change-strip-metric-label">SEMANTIC MATCH</span>
+        </div>
+        <div class="change-strip-metric">
+          <span class="change-strip-metric-value" id="change-confidence-value">92%</span>
+          <span class="change-strip-metric-label">CHANGE CONFIDENCE</span>
+        </div>
+        <span class="change-status-badge" id="change-status-badge">CHANGE SUPPORTED</span>
+      </div>
+
+      <!-- Main evidence view (~45%) -->
+      <div class="change-evidence-section">
+        <div class="evidence-toolbar">
+          <div class="evidence-mode-toggle" role="tablist" aria-label="Evidence view mode">
+            <button class="evidence-mode-btn is-active" type="button" data-mode="timeline" role="tab" aria-selected="true">TIMELINE</button>
+            <button class="evidence-mode-btn" type="button" data-mode="compare" role="tab" aria-selected="false">BEFORE / AFTER</button>
+            <button class="evidence-mode-btn" type="button" data-mode="changemap" role="tab" aria-selected="false">CHANGE MAP</button>
+          </div>
+          <div class="evidence-toolbar-spacer"></div>
+          <div class="sensor-mode-toggle" role="tablist" aria-label="Sensor mode">
+            <button class="sensor-mode-btn is-active" type="button" data-sensor="optical" role="tab" aria-selected="true">OPTICAL</button>
+            <button class="sensor-mode-btn" type="button" data-sensor="sar" role="tab" aria-selected="false">SAR</button>
+            <button class="sensor-mode-btn" type="button" data-sensor="combined" role="tab" aria-selected="false">COMBINED</button>
+          </div>
+        </div>
+
+        <div class="evidence-canvas-wrap" id="evidence-canvas-wrap">
+          <svg class="evidence-svg" id="evidence-svg" viewBox="0 0 800 500" preserveAspectRatio="none" aria-hidden="true"></svg>
+
+          <div class="compare-wrap" id="compare-wrap" hidden>
+            <div class="compare-layer compare-before" id="compare-before">
+              <svg class="evidence-svg" viewBox="0 0 800 500" preserveAspectRatio="none" aria-hidden="true"></svg>
+            </div>
+            <div class="compare-layer compare-after" id="compare-after">
+              <svg class="evidence-svg" viewBox="0 0 800 500" preserveAspectRatio="none" aria-hidden="true"></svg>
+            </div>
+            <span class="compare-label compare-label-before" id="compare-label-before">MAR 2024 · BASELINE</span>
+            <span class="compare-label compare-label-after" id="compare-label-after">MAR 2025 · CURRENT</span>
+            <div class="compare-divider" id="compare-divider">
+              <div class="compare-divider-handle">
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M5 3L2 8L5 13M11 3L14 8L11 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="change-map-legend" id="change-map-legend" hidden>
+            <span class="legend-item"><span class="legend-swatch legend-baseline"></span>BASELINE</span>
+            <span class="legend-item"><span class="legend-swatch legend-early"></span>EARLY SIGNAL</span>
+            <span class="legend-item"><span class="legend-swatch legend-confirmed"></span>CONFIRMED CHANGE</span>
+          </div>
+
+          <div class="change-state-badge" id="change-state-badge">EMERGING</div>
+
+          <div class="acquisition-card" id="acquisition-card">
+            <p class="acquisition-label">ACQUISITION</p>
+            <p class="acquisition-date" id="acq-date">13 OCT 2024</p>
+            <p class="acquisition-sensor" id="acq-sensor">Sentinel-2</p>
+            <div class="acquisition-grid">
+              <p class="acquisition-grid-label">CLOUD COVER</p>
+              <p class="acquisition-grid-label">VALID PIXELS</p>
+              <p class="acquisition-grid-value" id="acq-cloud">6%</p>
+              <p class="acquisition-grid-value" id="acq-valid">94%</p>
+              <p class="acquisition-grid-label" style="grid-column: 1 / -1;">SCENE ID</p>
+              <p class="acquisition-grid-value" id="acq-scene" style="grid-column: 1 / -1;">S2A_MSIL2A_20241013</p>
+            </div>
+          </div>
+
+          <div class="evidence-chrome evidence-north" aria-hidden="true">N<br />&#8593;</div>
+          <div class="evidence-chrome evidence-scale" aria-hidden="true">
+            <span class="evidence-scale-bar"></span>
+            <span>200 m</span>
+          </div>
+          <div class="evidence-chrome evidence-coords" id="evidence-coords">24.7802° N, 92.9376° E</div>
+        </div>
+
+        <p class="sensor-note" id="sensor-note" hidden></p>
+      </div>
+
+      <!-- Temporal timeline (~20%) -->
+      <div class="change-timeline-section">
+        <div class="timeline-panel">
+          <div class="timeline-header-row">
+            <p class="section-label" style="margin:0;">TIME CONTROL</p>
+            <div class="playback-controls">
+              <button class="btn-playback is-primary" type="button" id="btn-play">&#9654; PLAY TIMELINE</button>
+              <button class="btn-playback" type="button" id="btn-pause">PAUSE</button>
+              <button class="btn-playback" type="button" id="btn-reset">RESET</button>
+            </div>
+          </div>
+
+          <div class="timeline-track">
+            <input type="range" class="timeline-slider" id="timeline-slider" min="0" max="7" step="1" value="5" aria-label="Observation date" />
+            <div class="timeline-ticks" id="timeline-ticks"></div>
+          </div>
+          <div class="change-event-callout" id="change-event-callout">CHANGE · 13 OCT 2024</div>
+
+          <div class="confidence-graph">
+            <p class="section-label">CHANGE CONFIDENCE TRAJECTORY</p>
+            <svg class="confidence-graph-svg" id="confidence-graph-svg" viewBox="0 0 560 140" aria-label="Change confidence trajectory"></svg>
+          </div>
+        </div>
+
+        <div class="earliest-panel">
+          <p class="earliest-eyebrow">EARLIEST SUPPORTED CHANGE</p>
+          <p class="earliest-date" id="earliest-date">13 OCT 2024</p>
+          <p class="earliest-interval" id="earliest-interval">± 34 DAYS</p>
+          <p class="earliest-desc">First observation with sufficient evidence to support persistent structural change.</p>
+        </div>
+      </div>
+
+      <!-- Analysis / evidence (~20%) -->
+      <div class="change-analysis-grid">
+        <div>
+          <div class="analysis-panel">
+            <p class="panel-title">CHANGE EVIDENCE</p>
+            <div class="evidence-confidence-line">
+              <span class="evidence-confidence-value" id="evidence-confidence-value">92%</span>
+              <span class="section-label" style="margin:0;">CHANGE CONFIDENCE · SUPPORTED</span>
+            </div>
+            <div class="evidence-columns">
+              <div>
+                <p class="filter-section-label">SUPPORTING SIGNALS</p>
+                <ul class="why-list" id="evidence-signals"></ul>
+              </div>
+              <div>
+                <p class="filter-section-label">CONFOUNDERS</p>
+                <ul class="why-list" id="evidence-confounders"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-panel collapsible-section" id="why-change-section">
+            <button class="collapsible-header" type="button">
+              <span class="panel-title">WHY THIS CHANGE?</span>
+              <svg class="collapsible-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+            <div class="collapsible-body" id="why-steps"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="analysis-panel">
+            <p class="panel-title" style="margin-bottom: var(--space-4);">CHANGE METRICS</p>
+            <div class="metrics-row">
+              <div>
+                <p class="metric-cell-label">CHANGE TYPE</p>
+                <p class="metric-cell-value" id="metric-change-type">Construction</p>
+              </div>
+              <div>
+                <p class="metric-cell-label">AFFECTED AREA</p>
+                <p class="metric-cell-value" id="metric-area">2,840 m²</p>
+              </div>
+              <div>
+                <p class="metric-cell-label">EARLIEST SUPPORT</p>
+                <p class="metric-cell-value" id="metric-earliest">13 Oct 2024</p>
+              </div>
+              <div>
+                <p class="metric-cell-label">OBSERVATIONS</p>
+                <p class="metric-cell-value" id="metric-observations">7</p>
+              </div>
+              <div>
+                <p class="metric-cell-label">SENSORS</p>
+                <p class="metric-cell-value" id="metric-sensors">Sentinel-2</p>
+              </div>
+              <div>
+                <p class="metric-cell-label">PERSISTENCE</p>
+                <p class="metric-cell-value" id="metric-persistence">4 consecutive observations</p>
+              </div>
+            </div>
+
+            <p class="panel-title" style="margin: var(--space-5) 0 0;">OBSERVATION QUALITY</p>
+            <div class="quality-strip">
+              <div>
+                <p class="metric-cell-label">CLOUD</p>
+                <p class="metric-cell-value" id="quality-cloud">6%</p>
+              </div>
+              <div>
+                <p class="metric-cell-label">VALID PIXELS</p>
+                <p class="metric-cell-value" id="quality-valid">94%</p>
+              </div>
+              <div>
+                <p class="metric-cell-label">REGISTRATION</p>
+                <p class="metric-cell-value quality-cell-value is-pass" id="quality-registration">PASS</p>
+              </div>
+              <div>
+                <p class="metric-cell-label">SEASONALITY</p>
+                <p class="metric-cell-value quality-cell-value is-pass" id="quality-seasonality">PASS</p>
+              </div>
+              <div>
+                <p class="metric-cell-label">RADIOMETRIC NORM.</p>
+                <p class="metric-cell-value quality-cell-value is-pass" id="quality-radiometric">PASS</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-panel collapsible-section" id="provenance-section">
+            <button class="collapsible-header" type="button">
+              <span class="panel-title">SOURCE &amp; PROCESSING</span>
+              <svg class="collapsible-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+            <div class="collapsible-body">
+              <div class="provenance-grid">
+                <div>
+                  <p class="provenance-label">SOURCE</p>
+                  <p class="provenance-value" id="prov-source">Sentinel-2 L2A</p>
+                </div>
+                <div>
+                  <p class="provenance-label">SCENES</p>
+                  <p class="provenance-value" id="prov-scenes">7 observations</p>
+                </div>
+                <div>
+                  <p class="provenance-label">MODEL</p>
+                  <p class="provenance-value" id="prov-model">CCDC-style temporal analysis</p>
+                </div>
+                <div>
+                  <p class="provenance-label">INDEX</p>
+                  <p class="provenance-value" id="prov-index">Local spatial + semantic index</p>
+                </div>
+                <div style="grid-column: 1 / -1;">
+                  <p class="provenance-label">PROCESSING</p>
+                  <ul class="provenance-list" id="prov-processing"></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-panel analyst-controls">
+            <p class="panel-title">ANALYST DECISION</p>
+            <div class="analyst-buttons">
+              <button class="btn-analyst confirm" type="button" id="btn-confirm-change">CONFIRM CHANGE</button>
+              <button class="btn-analyst uncertain" type="button" id="btn-mark-uncertain">MARK UNCERTAIN</button>
+              <button class="btn-analyst reject" type="button" id="btn-reject-change">REJECT CHANGE</button>
+            </div>
+            <p class="analyst-status-line" id="analyst-status-line">No analyst decision recorded yet.</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<!-- Toast stack -->
+<div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-icon">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M10 6.5V10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="10" cy="13.2" r="0.9" fill="currentColor"/>
+      </svg>
+    </div>
+    <h2 class="modal-title" id="modal-title">Module ready for integration.</h2>
+    <p class="modal-body" id="modal-body">This capability is staged for a later prototype phase.</p>
+    <button class="modal-close" id="modal-close" type="button">Understood</button>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

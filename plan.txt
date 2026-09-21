@@ -1,0 +1,1809 @@
+Yes. I reviewed the selected SIH26227 problem statement and your existing HeisenBug proposal. The important thing is that your prototype should **not look like “a map + satellite images + an AI search bar.”** The problem statement is broader: semantic and image retrieval, multi-temporal change detection, false-alarm suppression, similar-site discovery, analyst review/provenance, incremental ingestion, and fully offline operation. 
+
+Your presentation already frames the flow as **plain-language query → AI understanding → archive search → temporal analysis → verified change report**, with Sentinel-1/2, Landsat, CCDC, geo-object indexing and analyst feedback. 
+
+The prototype I would build around that is:
+
+# HEISENBUG // ORBIT
+
+### **Evidence-first Satellite Intelligence Workstation**
+
+The key visual idea:
+
+> **Don't make the AI answer the analyst. Make the AI build the evidence chain.**
+
+Instead of a conventional dashboard, the entire UI tells one story:
+
+**QUESTION → DISCOVERY → CHANGE TRAJECTORY → EVIDENCE → REVIEW → DECISION**
+
+That is much more memorable in an SIH demo.
+
+---
+
+# 1. What should make your prototype different
+
+I researched current EO interfaces and satellite-analysis workflows. Existing systems commonly expose maps, layer controls, date comparison, scene lists and swipe/opacity comparison. NASA Worldview, for example, exposes comparison modes such as Swipe, Opacity and Spy and a time scale; Planet exposes scene lists, filters and image comparison. ([Worldview][1])
+
+Copernicus is also increasingly organized around standardized spatio-temporal cataloging and STAC-based search/filtering. ([Stacspec][2])
+
+So your differentiation should **not** be:
+
+> "We have a nicer satellite map."
+
+Instead:
+
+### Your standout layer is the **Evidence Intelligence Layer**
+
+Every detected change should answer:
+
+**What changed?**
+**Where?**
+**When did it start?**
+**Why do we believe it is real?**
+**What evidence contradicts it?**
+**Which scenes support it?**
+**What other locations look similar?**
+**What did the analyst decide?**
+
+That aligns exceptionally well with the actual problem statement's requirement for before/after evidence, acquisition time, sensor/source, confidence, processing history and an audit trail. 
+
+---
+
+# 2. Overall application structure
+
+Do **not** make 8–10 separate dashboard pages.
+
+Make it feel like a single intelligence workstation.
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ HEISENBUG / ORBIT                         AIR-GAPPED ●   INDEX READY   11:42 │
+├───────────────┬──────────────────────────────────────────────────────────────┤
+│               │                                                              │
+│  COMMAND      │                 MAIN INTELLIGENCE CANVAS                     │
+│               │                                                              │
+│  ◉ Mission    │                                                              │
+│               │                                                              │
+│  ◌ Discover   │                 MAP / EVIDENCE / ANALYSIS                     │
+│               │                                                              │
+│  ◌ Changes    │                                                              │
+│               │                                                              │
+│  ◌ Review     │                                                              │
+│               │                                                              │
+│  ◌ Similar    │                                                              │
+│               │                                                              │
+│  ◌ Archive    │                                                              │
+│               │                                                              │
+│  ─────────    │                                                              │
+│               │                                                              │
+│  SYSTEM       │                                                              │
+│  Index        │                                                              │
+│  Provenance   │                                                              │
+│               │                                                              │
+└───────────────┴──────────────────────────────────────────────────────────────┘
+```
+
+Keep it **light, precise and intelligence-oriented**.
+
+I would avoid the usual flashy dark cyber-war aesthetic. It often makes hackathon dashboards look generic.
+
+Use:
+
+* off-white / very light gray background
+* charcoal text
+* satellite imagery as the visual focus
+* restrained green/amber/red status colors
+* thin borders
+* small uppercase metadata
+* strong typography
+* minimal gradients
+* no giant glassmorphism cards
+
+Think:
+
+**NASA workstation + Palantir-style evidence workflow + modern geospatial research tool**
+
+rather than:
+
+**“AI military dashboard from a sci-fi movie.”**
+
+---
+
+# 3. SCREEN 01 — Mission Command
+
+This should be the first screen judges see.
+
+## Wireframe
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ HEISENBUG / ORBIT                                      AIR-GAPPED ●          │
+│ SATELLITE INTELLIGENCE WORKSTATION                     LOCAL INDEX  READY   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  MISSION SEARCH                                                             │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ ◉  Show newly built structures near a river                        │   │
+│  │     between 2023 and 2025                                  [RUN →] │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  TRY:                                                                       │
+│  [ NEW CONSTRUCTION ] [ ROAD EXPANSION ] [ LAND CLEARANCE ]                 │
+│  [ FACILITY GROWTH ] [ WATER CHANGE ]                                      │
+│                                                                             │
+│  OR                                                                         │
+│  [ DROP REFERENCE IMAGE ]        [ DRAW AOI ]        [ USE SAVED MISSION ]  │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   SEARCH INTERPRETATION                                                     │
+│                                                                             │
+│   LOCATION             TIME              TARGET             CONSTRAINTS      │
+│   ┌──────────────┐     ┌────────────┐    ┌─────────────┐   ┌────────────┐  │
+│   │ River zones  │     │ 2023–2025  │    │ Construction│   │ Low cloud  │  │
+│   └──────────────┘     └────────────┘    └─────────────┘   │ High conf. │  │
+│                                                            └────────────┘  │
+│                                                                             │
+│  SEMANTIC INTENT                                                            │
+│  "Find persistent structural growth near flowing water."                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### The impressive detail
+
+When the judge enters:
+
+> Show new constructions near a river in the last 2 years
+
+don't immediately show results.
+
+Animate:
+
+```text
+QUERY
+  ↓
+INTENT PARSED
+  ↓
+AOI IDENTIFIED
+  ↓
+TIME WINDOW IDENTIFIED
+  ↓
+TARGET OBJECT = STRUCTURE
+  ↓
+SPATIAL RELATION = NEAR WATER
+  ↓
+TEMPORAL CONDITION = NEW / PERSISTENT
+```
+
+This makes the semantic retrieval architecture visually obvious.
+
+Your problem statement explicitly calls for natural-language and image-to-image retrieval, with spatial, temporal and sensor filtering. 
+
+---
+
+# 4. SCREEN 02 — Semantic Discovery
+
+This is where most competing prototypes will probably look similar.
+
+So don't just make:
+
+```text
+MAP + RESULTS
+```
+
+Make:
+
+```text
+SEMANTIC SEARCH SPACE
+```
+
+## Wireframe
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ DISCOVERY / SEMANTIC SEARCH                                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│ QUERY                                                                       │
+│ "New structures near river"                              87 candidates     │
+│                                                                             │
+├───────────────────┬─────────────────────────────────────┬───────────────────┤
+│ FILTERS           │             MAP                     │ RESULTS           │
+│                   │                                     │                   │
+│ TIME              │        satellite imagery           │ #01  94% MATCH    │
+│ ● 2023            │                                     │ ┌─────────────┐ │
+│ ● 2024            │       ◉ CANDIDATE                   │ │ image       │ │
+│ ● 2025            │                  ◉                  │ └─────────────┘ │
+│                   │                            ◉        │ River proximity  │
+│ SENSOR            │                                     │ Structure growth │
+│ ☑ Sentinel-2      │                                     │                   │
+│ ☑ Sentinel-1      │                                     │ #02  91% MATCH   │
+│ □ Landsat         │                                     │ ┌─────────────┐ │
+│                   │                                     │ │ image       │ │
+│ CLOUD             │                                     │ └─────────────┘ │
+│ < 20%             │                                     │                   │
+│                   │                                     │ #03  88% MATCH   │
+│ OBJECT             │                                     │                   │
+│ ☑ Buildings       │                                     │                   │
+│ ☑ Roads           │                                     │ [VIEW ALL 87]     │
+│                   │                                     │                   │
+└───────────────────┴─────────────────────────────────────┴───────────────────┘
+```
+
+But add a special element:
+
+## "WHY THIS RESULT?"
+
+When hovering a result:
+
+```text
+┌─────────────────────────────┐
+│ WHY THIS RESULT?             │
+│                              │
+│ ✓ Structural similarity      │
+│ ✓ River adjacency            │
+│ ✓ Persistent across 4 dates  │
+│ ✓ Construction signature     │
+│                              │
+│ − Moderate cloud cover       │
+│                              │
+│ MATCH CONFIDENCE             │
+│ ███████████████████░ 94%     │
+└─────────────────────────────┘
+```
+
+This transforms a similarity score into an **interpretable retrieval explanation**.
+
+RemoteCLIP specifically targets remote-sensing vision-language alignment and supports image-text retrieval and downstream remote-sensing tasks, which supports making semantic search a first-class interaction rather than a fake chatbot. ([arXiv][3])
+
+---
+
+# 5. SCREEN 03 — THE DIFFERENTIATOR: Change Trajectory
+
+This should be your hero screen.
+
+Most teams will probably show:
+
+```text
+BEFORE | AFTER | DIFFERENCE
+```
+
+You should show:
+
+```text
+BEFORE → EVOLUTION → CHANGE POINT → AFTER
+```
+
+Because CCDC is fundamentally based on continuous time-series change detection rather than just comparing two dates. Your proposal already uses CCDC for this purpose.  ([ScienceDirect][4])
+
+## Wireframe
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ CHANGE  /  SITE #0147                                      CONFIDENCE 92%     │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  LOCATION                                                                    │
+│  24.7802° N, 92.9376° E                                                     │
+│                                                                              │
+│ ┌──────────────────────────────────────────────────────────────────────────┐ │
+│ │                                                                          │ │
+│ │                         SATELLITE VIEW                                   │ │
+│ │                                                                          │ │
+│ │                       ┌─────────────┐                                    │ │
+│ │                       │  CHANGE AOI │                                    │ │
+│ │                       └─────────────┘                                    │ │
+│ │                                                                          │ │
+│ └──────────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+│  TEMPORAL TRAJECTORY                                                        │
+│                                                                              │
+│  2022       2023       2024       2025                                     │
+│   │          │          │          │                                        │
+│   ●──────────●──────────●──────────●                                        │
+│              ↑                                                             │
+│         FIRST SIGNAL                                                        │
+│                                                                              │
+│         OCT 2024                                                           │
+│         confidence interval: ± 34 days                                     │
+│                                                                              │
+├──────────────────────────────────────┬───────────────────────────────────────┤
+│ BEFORE                               │ AFTER                                 │
+│ Mar 2024                             │ Mar 2025                              │
+│                                      │                                       │
+│       satellite image                │       satellite image                 │
+│                                      │           ███                         │
+│                                      │       NEW ███                         │
+│                                      │       STRUCTURE                       │
+├──────────────────────────────────────┴───────────────────────────────────────┤
+│                                                                              │
+│ CHANGE TYPE         Construction                                            │
+│ AFFECTED AREA       2,840 m²                                                │
+│ EARLIEST SIGNAL     Oct 2024                                                │
+│ SENSOR              Sentinel-2                                              │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+# 6. Make the timeline interactive
+
+This is where the prototype can become memorable.
+
+At the bottom:
+
+```text
+2023 ──────── 2024 ───────── 2025
+
+        [●]────[●]────[●]────[●]────[●]
+         Jan    Apr    Jul    Oct    Jan
+                      ↑
+                 detected change
+```
+
+Dragging the date marker changes the satellite image.
+
+The judge sees:
+
+```text
+April 2024
+↓
+No structure
+
+July 2024
+↓
+Early disturbance
+
+October 2024
+↓
+Structural footprint emerges
+
+January 2025
+↓
+Expansion confirmed
+```
+
+This demonstrates **earliest supported observation**, which is explicitly required. 
+
+QGIS and NASA Worldview both demonstrate the importance of temporal controls and comparison modes in geospatial interfaces. ([QGIS Documentation][5])
+
+---
+
+# 7. Screen 04 — False Alarm Laboratory
+
+This is one of the strongest things you can add.
+
+Don't only show detected changes.
+
+Show:
+
+> **What the system rejected.**
+
+That directly addresses the problem statement's requirement to deal with seasonality, illumination, cloud/haze, shadows, registration error and sensor differences. 
+
+## Wireframe
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ FALSE-ALARM LAB                                      143 CANDIDATES ANALYZED │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  DETECTED            REJECTED                                              │
+│                                                                             │
+│  17 TRUE CHANGES     126 FALSE / UNCERTAIN                                 │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  WHY WERE SIGNALS REJECTED?                                                │
+│                                                                             │
+│  CLOUD / HAZE              ████████████████  48                             │
+│  SEASONAL CHANGE           ███████████      31                             │
+│  RIVER STAGE               ████████         19                             │
+│  MIS-REGISTRATION          █████            14                             │
+│  SUN ANGLE                 ████             9                              │
+│  LOW QUALITY               ██               5                              │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   EXAMPLE REJECTION                                                         │
+│                                                                             │
+│   BEFORE                AFTER                     VERDICT                    │
+│   ┌─────────┐           ┌─────────┐                ✕                       │
+│   │ image   │     →     │ image   │        Seasonal variation              │
+│   └─────────┘           └─────────┘                                          │
+│                                                                             │
+│   Reason: vegetation cycle detected in historical baseline                  │
+│   Evidence: similar pattern observed in 2022 + 2023                         │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+This is a very strong judging moment:
+
+> "We don't just find differences. We show why a difference was **not** considered a real change."
+
+That is much closer to the actual difficulty of the problem than generic "AI detected change."
+
+---
+
+# 8. Screen 05 — Evidence Dossier
+
+This is where your system becomes a real intelligence workflow.
+
+## Wireframe
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ EVIDENCE DOSSIER                                      CASE HX-2025-0147     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ASSESSMENT                                                                 │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │ Persistent structural development detected near river corridor.      │  │
+│  │                                                                      │  │
+│  │ Confidence        92%                                                │  │
+│  │ Earliest support  Oct 2024                                            │  │
+│  │ Change type       Construction                                        │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  EVIDENCE CHAIN                                                             │
+│                                                                             │
+│  QUERY                                                                       │
+│    ↓                                                                        │
+│  SCENE RETRIEVAL                                                            │
+│    ↓                                                                        │
+│  OBJECT MATCH                                                               │
+│    ↓                                                                        │
+│  TEMPORAL SIGNAL                                                            │
+│    ↓                                                                        │
+│  FALSE-ALARM CHECK                                                          │
+│    ↓                                                                        │
+│  CHANGE CONFIRMED                                                           │
+│                                                                             │
+├─────────────────────┬───────────────────────┬───────────────────────────────┤
+│ SUPPORTING EVIDENCE │ CONTRADICTING EVIDENCE│ SOURCE                        │
+│                     │                       │                               │
+│ ✓ persistent signal │ − moderate haze       │ Sentinel-2 L2A                 │
+│ ✓ structure growth  │                       │ 2024-10-13                     │
+│ ✓ same AOI          │                       │                               │
+│ ✓ 3 confirmations   │                       │ Sentinel-2 L2A                 │
+│                     │                       │ 2025-01-21                     │
+└─────────────────────┴───────────────────────┴───────────────────────────────┘
+```
+
+---
+
+# 9. The killer interaction: "Evidence Graph"
+
+Add a toggle:
+
+```text
+[ MAP ] [ TIMELINE ] [ EVIDENCE GRAPH ]
+```
+
+When the judge clicks Evidence Graph:
+
+```text
+                       QUERY
+                         │
+                         ▼
+                "NEW STRUCTURES"
+                         │
+              ┌──────────┴──────────┐
+              ▼                     ▼
+        RIVER PROXIMITY        STRUCTURE EMBEDDING
+              │                     │
+              └──────────┬──────────┘
+                         ▼
+                     SITE #0147
+                         │
+              ┌──────────┼──────────┐
+              ▼          ▼          ▼
+           2023       2024       2025
+              │          │          │
+              └──────────┼──────────┘
+                         ▼
+                  CHANGE SIGNAL
+                         │
+                   ┌─────┴─────┐
+                   ▼           ▼
+                 SUPPORT     REJECT
+                   │
+                   ▼
+               CONFIDENCE
+                  92%
+                   │
+                   ▼
+              ANALYST REVIEW
+```
+
+That makes your system feel like an **intelligence reasoning workspace**, rather than a GIS viewer.
+
+---
+
+# 10. Screen 06 — Similar Sites
+
+This directly covers the problem statement's discovery and clustering requirement. 
+
+After selecting one site:
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ DISCOVER SIMILAR SITES                                                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│ SELECTED SITE                                                               │
+│ ┌──────────────┐                                                           │
+│ │ SITE #0147   │                                                           │
+│ │ construction │                                                           │
+│ └──────────────┘                                                           │
+│          │                                                                  │
+│          ▼                                                                  │
+│       EMBEDDING                                                             │
+│          │                                                                  │
+│     ┌────┴────┐                                                            │
+│     ▼         ▼                                                            │
+│  CLUSTER A  CLUSTER B                                                      │
+│                                                                             │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐                           │
+│  │ SITE 18 │ │ SITE 22 │ │ SITE 41 │ │ SITE 72 │                           │
+│  │ 91%     │ │ 89%     │ │ 87%     │ │ 86%     │                           │
+│  └─────────┘ └─────────┘ └─────────┘ └─────────┘                           │
+│                                                                             │
+│  COMMON SIGNALS                                                            │
+│  • low-density structure expansion                                         │
+│  • proximity to water                                                       │
+│  • similar footprint growth                                                 │
+│  • comparable temporal signature                                            │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+This creates a beautiful demo:
+
+> "The analyst found one site. The system found the next 17."
+
+That is much stronger than merely displaying search results.
+
+---
+
+# 11. Screen 07 — Analyst Review Queue
+
+Make the review interface extremely fast.
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ REVIEW QUEUE                                  12 HIGH-CONFIDENCE CHANGES     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│ #0147   Construction       92%      Oct 2024          [REVIEW]             │
+│ #0183   Road expansion     89%      Dec 2024          [REVIEW]             │
+│ #0211   Land clearance     87%      Aug 2024          [REVIEW]             │
+│ #0318   Facility expansion 85%      Nov 2024          [REVIEW]             │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│ CURRENT CASE                                                                │
+│                                                                             │
+│        BEFORE               CHANGE MAP              AFTER                    │
+│      ┌────────┐             ┌────────┐            ┌────────┐                │
+│      │        │             │  ███   │            │ █████  │                │
+│      │  image │      →      │ █████  │     →      │ █████  │                │
+│      │        │             │  ███   │            │ █████  │                │
+│      └────────┘             └────────┘            └────────┘                │
+│                                                                             │
+│                      [ ✓ CONFIRM ] [ ? UNCERTAIN ] [ ✕ REJECT ]             │
+│                                                                             │
+│  COMMENT: ________________________________________________________________  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+Every analyst action gets recorded:
+
+```text
+10:42:16  CASE #0147 OPENED
+10:42:23  EVIDENCE REVIEWED
+10:42:41  ANALYST CONFIRMED
+10:42:41  FEEDBACK STORED
+10:42:42  INDEX ADAPTATION QUEUED
+```
+
+The original PS specifically requires confirmation/rejection, audit trail and feedback for refinement. 
+
+---
+
+# 12. Screen 08 — Provenance
+
+This screen will impress technical judges.
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PROVENANCE                                                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│ CASE HX-2025-0147                                                          │
+│                                                                             │
+│ SOURCE                                                                       │
+│ Sentinel-2 L2A                                                              │
+│                                                                             │
+│ SCENES                                                                       │
+│ 2023-03-14                                                                  │
+│ 2024-04-18                                                                  │
+│ 2024-10-13                                                                  │
+│ 2025-01-21                                                                  │
+│                                                                             │
+│ PROCESSING                                                                   │
+│ ✓ geometric normalization                                                   │
+│ ✓ cloud mask                                                                │
+│ ✓ temporal normalization                                                    │
+│ ✓ spatial alignment                                                         │
+│ ✓ embedding retrieval                                                       │
+│ ✓ temporal change analysis                                                  │
+│                                                                             │
+│ MODEL                                                                        │
+│ RemoteCLIP                                                                  │
+│ CCDC                                                                        │
+│ reranker                                                                    │
+│                                                                             │
+│ INDEX                                                                        │
+│ STAC / Vector / Spatial                                                     │
+│                                                                             │
+│ [ EXPORT EVIDENCE PACKAGE ]                                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+STAC is especially suitable for the visual language of this screen because its core purpose is standardized description of spatio-temporal assets, including datetime, thumbnails, links and assets; Copernicus is actively exposing Sentinel data through STAC. ([Stacspec][2])
+
+---
+
+# 13. Screen 09 — Offline / Sovereignty proof
+
+Make this a **visual feature**, not buried inside settings.
+
+Top right:
+
+```text
+┌──────────────────────────────────┐
+│ ● AIR-GAPPED                     │
+│ NETWORK                          │
+│ ──────────────────────────────── │
+│ INTERNET      OFF                │
+│ LOCAL MODEL   READY              │
+│ LOCAL INDEX   READY              │
+│ LOCAL DATA    1.8 TB             │
+│                                  │
+│ LAST INGESTION                   │
+│ 21 SEP 2026 / 08:14              │
+└──────────────────────────────────┘
+```
+
+Then add a dramatic demo button:
+
+### `SIMULATE NETWORK LOSS`
+
+When clicked:
+
+```text
+NETWORK CONNECTION LOST
+────────────────────────
+
+SYSTEM REMAINS OPERATIONAL
+
+✓ semantic search
+✓ image retrieval
+✓ temporal analysis
+✓ evidence generation
+✓ review workflow
+
+LOCAL SERVICES: 7/7 ONLINE
+```
+
+This maps directly to the requirement that evaluation runs with network access disabled after local staging. 
+
+---
+
+# 14. Screen 10 — Incremental Ingestion
+
+A lot of prototypes will completely ignore this.
+
+Don't.
+
+Make a compact technical screen:
+
+```text
+┌────────────────────────────────────────────────────────────────────────────┐
+│ ARCHIVE / INGESTION                                                        │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│ NEW ACQUISITION                                                            │
+│                                                                            │
+│  GeoTIFF / COG                                                            │
+│       │                                                                    │
+│       ▼                                                                    │
+│  VALIDATE                                                                   │
+│       │                                                                    │
+│       ▼                                                                    │
+│  GEOREFERENCE                                                               │
+│       │                                                                    │
+│       ▼                                                                    │
+│  TILE                                                                        │
+│       │                                                                    │
+│       ▼                                                                    │
+│  EMBED                                                                       │
+│       │                                                                    │
+│       ▼                                                                    │
+│  INDEX                                                                       │
+│       │                                                                    │
+│       ▼                                                                    │
+│  AVAILABLE                                                                  │
+│                                                                            │
+│ CURRENT INDEX                                                               │
+│ Scenes             128,442                                                 │
+│ Geo-objects         684,920                                                 │
+│ Embeddings          684,920                                                 │
+│ Storage             1.82 TB                                                 │
+│ Last update         21 Sep 2026                                             │
+│                                                                            │
+│ [ + INGEST DATA ]                                                          │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+# 15. The complete prototype flow
+
+For the actual SIH demo, don't show every feature.
+
+Use this story:
+
+```text
+01
+MISSION SEARCH
+        ↓
+"Show new structures near a river"
+
+02
+SEMANTIC INTERPRETATION
+        ↓
+AOI + TARGET + TIME + RELATION
+
+03
+SEARCH
+        ↓
+87 candidate sites
+
+04
+SELECT SITE #0147
+        ↓
+94% semantic match
+
+05
+TEMPORAL ANALYSIS
+        ↓
+2023 → 2024 → 2025
+
+06
+EARLIEST SUPPORTED CHANGE
+        ↓
+October 2024 ± 34 days
+
+07
+FALSE-ALARM CHECK
+        ↓
+Seasonality rejected
+Cloud influence discounted
+Mis-registration passed
+
+08
+EVIDENCE DOSSIER
+        ↓
+92% confidence
+
+09
+SIMILAR-SITE DISCOVERY
+        ↓
+17 related sites
+
+10
+ANALYST CONFIRM
+        ↓
+Stored in audit trail
+
+11
+NETWORK LOSS
+        ↓
+System still operational
+```
+
+That is an excellent **90–120 second hackathon demonstration**.
+
+---
+
+# 16. A very important visual feature: "AI reasoning without chatbot"
+
+I would **not** put a giant ChatGPT-style chat panel in this application.
+
+The AI should appear as structured reasoning:
+
+```text
+AI ANALYSIS
+
+QUERY UNDERSTOOD
+──────────────────────────
+Target        Construction
+Relation      Near river
+Time          2023–2025
+Persistence   Required
+
+EVIDENCE CHECK
+──────────────────────────
+✓ 4 valid observations
+✓ consistent spatial footprint
+✓ structural growth detected
+✓ same location across sensors
+
+CONFOUNDERS
+──────────────────────────
+✓ clouds excluded
+✓ seasonal baseline checked
+✓ registration verified
+⚠ moderate haze on 2024-10-13
+
+ASSESSMENT
+──────────────────────────
+SUPPORTED CHANGE
+92% confidence
+```
+
+This feels much more professional than:
+
+> 🤖 "I think this is a construction site because..."
+
+---
+
+# 17. The "Change Confidence" visualization
+
+Instead of a normal progress bar:
+
+```text
+CONFIDENCE 92%
+```
+
+show:
+
+```text
+CHANGE CONFIDENCE TRAJECTORY
+
+100% ┤                         ●
+ 90% ┤                    ●────┘
+ 80% ┤               ●────
+ 70% ┤          ●────
+ 60% ┤      ●───
+ 50% ┤  ●───
+     └────────────────────────────
+       Jan 23   Jan 24   Oct 24   Jan 25
+                         ↑
+                   SUPPORTED CHANGE
+```
+
+That visually communicates that confidence accumulated over time.
+
+---
+
+# 18. Your map should NOT dominate the entire UI
+
+This is a common mistake.
+
+Use:
+
+```text
+30% controls
+50% evidence/map
+20% analysis
+```
+
+not:
+
+```text
+90% giant map
+10% everything else
+```
+
+Because your actual innovation is not mapping.
+
+It is:
+
+**semantic discovery + temporal reasoning + evidence.**
+
+---
+
+# 19. Recommended component architecture for Claude Code
+
+Since you already have Claude Code, don't ask it to "build a satellite dashboard."
+
+Give it a strict component structure.
+
+```text
+orbit-prototype/
+│
+├── index.html
+│
+├── css/
+│   ├── tokens.css
+│   ├── layout.css
+│   ├── components.css
+│   ├── map.css
+│   └── animations.css
+│
+├── js/
+│   ├── app.js
+│   ├── state.js
+│   ├── search.js
+│   ├── timeline.js
+│   ├── evidence.js
+│   ├── review.js
+│   ├── provenance.js
+│   └── demo-data.js
+│
+├── assets/
+│   ├── satellite/
+│   ├── change/
+│   ├── thumbnails/
+│   ├── icons/
+│   ├── logos/
+│   └── terrain/
+│
+└── data/
+    ├── scenes.json
+    ├── changes.json
+    ├── sites.json
+    ├── provenance.json
+    └── clusters.json
+```
+
+For this prototype, you can keep the data entirely local and simulated.
+
+---
+
+# 20. Assets you need
+
+## A. Satellite imagery
+
+You need approximately:
+
+### Hero AOI
+
+One location with:
+
+```text
+2022
+2023
+2024
+2025
+```
+
+Preferably the same AOI.
+
+### Secondary AOIs
+
+Around:
+
+```text
+10–20 sites
+```
+
+for search results.
+
+### Change examples
+
+Create examples of:
+
+* new construction
+* road expansion
+* land clearance
+* facility expansion
+* water extent change
+
+Those are all consistent with the use cases already described in your proposal. 
+
+---
+
+# 21. Satellite image asset structure
+
+Don't just store:
+
+```text
+image1.jpg
+image2.jpg
+```
+
+Use:
+
+```text
+assets/satellite/site-0147/
+
+2023-03.png
+2023-07.png
+2024-03.png
+2024-07.png
+2024-10.png
+2025-01.png
+```
+
+Then:
+
+```text
+assets/satellite/site-0211/
+assets/satellite/site-0318/
+assets/satellite/site-0422/
+```
+
+---
+
+# 22. You also need derived images
+
+For each important site:
+
+```text
+before.png
+after.png
+difference.png
+heatmap.png
+mask.png
+bbox.png
+```
+
+A beautiful card can then use:
+
+```text
+BEFORE
+AFTER
+CHANGE MAP
+```
+
+---
+
+# 23. Create fake but realistic data
+
+You don't need a fully functional ML backend for the first prototype.
+
+Example:
+
+```javascript
+{
+  id: "HX-0147",
+  type: "construction",
+  lat: 24.7802,
+  lon: 92.9376,
+
+  semanticScore: 0.94,
+  changeConfidence: 0.92,
+
+  earliestSupportedDate: "2024-10-13",
+
+  affectedArea: 2840,
+
+  sensors: [
+    "Sentinel-2"
+  ],
+
+  evidence: {
+    positive: [
+      "persistent structural footprint",
+      "consistent across observations",
+      "river adjacency confirmed"
+    ],
+
+    negative: [
+      "moderate haze in one acquisition"
+    ]
+  },
+
+  rejectedFactors: [
+    "seasonality",
+    "registration error"
+  ]
+}
+```
+
+This is enough to make the interface look genuinely intelligent.
+
+---
+
+# 24. Add "mission presets"
+
+This is extremely important for your live demonstration.
+
+Put at the beginning:
+
+```text
+DEMO MISSIONS
+
+┌────────────────────────────────────┐
+│ 01  NEW CONSTRUCTION               │
+│ Search new structures near rivers  │
+└────────────────────────────────────┘
+
+┌────────────────────────────────────┐
+│ 02  ROAD DEVELOPMENT               │
+│ Detect new road expansion          │
+└────────────────────────────────────┘
+
+┌────────────────────────────────────┐
+│ 03  LAND CLEARANCE                 │
+│ Find persistent vegetation loss    │
+└────────────────────────────────────┘
+
+┌────────────────────────────────────┐
+│ 04  FACILITY EXPANSION             │
+│ Discover industrial growth         │
+└────────────────────────────────────┘
+```
+
+So the demo **never gets stuck** waiting for AI/backend processing.
+
+---
+
+# 25. A subtle but powerful feature: "Mission Replay"
+
+Add:
+
+```text
+▶ REPLAY ANALYSIS
+```
+
+This is perfect for your hackathon prototype.
+
+The UI replays:
+
+```text
+11:42:03 Query received
+11:42:03 Intent parsed
+11:42:04 Archive searched
+11:42:04 87 candidates retrieved
+11:42:05 14 candidates passed quality filters
+11:42:06 3 temporal trajectories confirmed
+11:42:06 Evidence package generated
+```
+
+This makes your prototype feel like an actual operational system.
+
+---
+
+# 26. Visual references you should borrow interaction ideas from
+
+Use these as **interaction references**, not designs to copy.
+
+![Image](https://images.openai.com/static-rsc-4/ld9evA-SAtAc7pdpPp7PlQYpMeMz-qFpF4NqqVCGo85tSwrAVazZnFtQtnMHf7q7YOkzPu60d333tDX089EVvg2ScX1bTo8rb2RONdv23084uP0N6C-mjlunGRmqGJGJpXK6E_hntHHt7wvBLKhlXiZ3aNLKbYcMypVzor6NOvpyrsZdrfHgsQUvjPr7qOJi?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/4u37edGwZ21sBIoHs37tPNrxeYTER_2MSTB6i8ZObdPQpOwY7vCBQwDLloFL4AN7VZOyQDfvrZSvFohrxW1ALoNhqipprfCf9PyiAoUfSfwigIY3JVyC0eWwiZX71KxvKQBCCiKrFEp2xMTq_Bw_UQGu2g3StET6bAsdkHP7FcA69XeougYzCBaPlgwRW08M?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/rA1bCkRdvwK6frxknlMVk2dhNGOxYoEs8oDmcBKOSfaU-FBw_1oZyJEK_ofWTR-uHprDog-YnMpt62M9Zi-MNiGU9JMfSIfi_hIsVCCTV4nBUhppCowhJvefJiA7pLeyVvigpyibGQFzFPN0JjNf0TvWDkgn4xWi7tbity7RnrY2kbqD4fvyCGdvSp_lnLo1?purpose=fullsize)
+
+![Image](https://static.wixstatic.com/media/0857ae_2d2e02cb8a884891b504db15b0511dfc~mv2.jpg/v1/fill/w_980%2Ch_555%2Cal_c%2Cq_85%2Cusm_0.66_1.00_0.01%2Cenc_avif%2Cquality_auto/0857ae_2d2e02cb8a884891b504db15b0511dfc~mv2.jpg)
+
+Useful patterns from current EO tools include:
+
+* temporal comparison
+* swipe comparison
+* scene result lists
+* spatial filtering
+* image previews
+* timeline-based analysis
+
+NASA Worldview explicitly exposes Swipe/Opacity/Spy comparison modes and temporal controls. ([Worldview][1]) Planet's interface similarly combines result lists, scene metadata and map exploration.
+
+Your opportunity is to put an additional **evidence/reasoning layer** on top of these conventional EO interaction patterns.
+
+---
+
+# 27. The visual identity I recommend
+
+## Brand
+
+```text
+HEISENBUG
+/
+ORBIT
+```
+
+Small subtitle:
+
+```text
+EVIDENCE-FIRST EARTH OBSERVATION INTELLIGENCE
+```
+
+## Colors
+
+Use mostly:
+
+```text
+Background       #F5F7F4
+Surface          #FFFFFF
+Primary text     #172019
+Secondary text   #68736B
+
+Detection        #D95F32
+Confirmed        #2F7D5B
+Warning          #B58900
+Neutral          #66706A
+Map highlight    #E7C34A
+```
+
+Don't turn the entire interface red/green.
+
+Only actual analytical states should use those colors.
+
+---
+
+# 28. Typography
+
+Something like:
+
+```text
+Inter
+IBM Plex Sans
+IBM Plex Mono
+```
+
+Use:
+
+```text
+INTER
+```
+
+for application UI and
+
+```text
+IBM PLEX MONO
+```
+
+for coordinates, timestamps, sensor IDs and provenance metadata.
+
+Example:
+
+```text
+24.7802° N
+92.9376° E
+```
+
+in monospace immediately makes it feel like an engineering workstation.
+
+---
+
+# 29. Small details that make it look expensive
+
+Add:
+
+```text
+SCENE ID
+S2A_MSIL2A_20241013
+```
+
+```text
+ACQUIRED
+2024-10-13 05:41 UTC
+```
+
+```text
+AOI
+2.84 km²
+```
+
+```text
+VALID PIXELS
+94.2%
+```
+
+```text
+PROCESSING
+1.82 s
+```
+
+These details make the simulated system feel real.
+
+---
+
+# 30. Do NOT do these things
+
+Avoid:
+
+### ❌ Giant chatbot
+
+This is not primarily a chatbot problem.
+
+### ❌ 3D globe
+
+A 3D globe looks impressive for five seconds but doesn't demonstrate the core PS.
+
+### ❌ Too many charts
+
+Satellite intelligence isn't improved by filling the screen with 15 charts.
+
+### ❌ Huge animated AI brain
+
+Generic hackathon design.
+
+### ❌ Excessive military graphics
+
+No fighter jets, radar animations, reticles, command-center clichés.
+
+### ❌ Fake "AI 98.7%" without explanation
+
+The PS specifically cares about evidence and false-alarm handling.
+
+### ❌ Only two-date difference
+
+Your proposal correctly emphasizes time-series change detection rather than two-date differencing. 
+
+---
+
+# 31. One feature I would make the signature of HeisenBug
+
+Call it:
+
+# **EVIDENCE STACK™**
+
+Every result gets an expandable stack:
+
+```text
+┌─────────────────────────────────────────────┐
+│ EVIDENCE STACK                              │
+├─────────────────────────────────────────────┤
+│                                             │
+│ 01  SEMANTIC MATCH                 94%      │
+│     construction + river proximity         │
+│                                             │
+│ 02  TEMPORAL PERSISTENCE           91%      │
+│     4 observations                         │
+│                                             │
+│ 03  SPATIAL CONSISTENCY            95%      │
+│     stable footprint                       │
+│                                             │
+│ 04  FALSE-ALARM CHECK              PASS     │
+│     seasonal variation rejected            │
+│                                             │
+│ 05  SENSOR QUALITY                  88%      │
+│     94% usable pixels                      │
+│                                             │
+│ ─────────────────────────────────────────── │
+│ FINAL EVIDENCE CONFIDENCE          92%      │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+This is much more interesting than a generic confidence badge.
+
+---
+
+# 32. Your final demo dashboard could look like this
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ HEISENBUG / ORBIT                        AIR-GAPPED ●   INDEX 128K   11:42   │
+├──────────────┬───────────────────────────────────────────────────────────────┤
+│              │                                                               │
+│  COMMAND     │  QUERY                                                       │
+│              │  "Show newly built structures near rivers"                   │
+│  Mission     │                                                               │
+│  Discover    ├───────────────────────────────────────────────────────────────┤
+│  Changes     │                                                               │
+│  Review      │   DISCOVERED 87     CONFIRMED 14      HIGH CONF 3            │
+│  Similar     │                                                               │
+│  Archive     ├─────────────────────────────────────┬─────────────────────────┤
+│              │                                     │                         │
+│  ──────────  │              MAP                    │      EVIDENCE           │
+│              │                                     │                         │
+│  Index       │          ◉         ◉                │   SITE #0147            │
+│  Provenance  │                                     │                         │
+│              │     ◉                     ◉          │   Construction          │
+│              │                                     │   Confidence 92%         │
+│              │            ┌─────────┐              │                         │
+│              │            │ CHANGE  │              │   Earliest Oct 2024     │
+│              │            └─────────┘              │                         │
+│              │                                     │   ✓ persistent          │
+│              │                                     │   ✓ spatial match       │
+│              │                                     │   ✓ quality passed      │
+│              │                                     │   − haze                │
+│              │                                     │                         │
+│              │                                     │ [OPEN EVIDENCE]         │
+│              ├─────────────────────────────────────┴─────────────────────────┤
+│              │                                                               │
+│              │  2023 ───── 2024 ───── 2025                                 │
+│              │                 ▲                                             │
+│              │          EARLIEST SUPPORT                                    │
+│              │                                                               │
+└──────────────┴───────────────────────────────────────────────────────────────┘
+```
+
+This is the **main screen I'd actually implement first**.
+
+---
+
+# 33. Claude Code prompt
+
+Give Claude Code something much more specific than "build this UI."
+
+Paste this:
+
+```text
+Build a polished frontend-only prototype called:
+
+HEISENBUG / ORBIT
+Evidence-First Satellite Intelligence Workstation
+
+Context:
+This prototype is for Smart India Hackathon 2026 problem statement SIH26227:
+Semantic Retrieval and Multi-Temporal Change Analysis of Satellite Imagery.
+
+The prototype must visually demonstrate:
+1. Natural-language semantic satellite search
+2. Image-to-image retrieval
+3. Multi-temporal change analysis
+4. Earliest supported change date
+5. False-alarm suppression
+6. Similar-site discovery / clustering
+7. Analyst review and feedback
+8. Evidence-backed change reports
+9. Provenance and audit trail
+10. Incremental ingestion
+11. Offline / air-gapped operation
+
+IMPORTANT:
+This is a DEMO PROTOTYPE.
+Use local simulated JSON data and local satellite image assets.
+Do not depend on external APIs for core functionality.
+Do not create a chatbot-centric interface.
+
+DESIGN DIRECTION:
+- Premium scientific / geospatial intelligence workstation
+- Light theme
+- Minimal
+- Precise
+- White/soft-gray surfaces
+- Satellite imagery is the visual focus
+- Restrained green/orange/amber status colors
+- No cyberpunk aesthetic
+- No giant gradients
+- No excessive glassmorphism
+- No 3D globe
+- No giant AI brain
+- No generic admin dashboard aesthetic
+
+MAIN PRODUCT IDEA:
+The application should tell an evidence chain:
+
+QUESTION
+→ DISCOVERY
+→ TEMPORAL TRAJECTORY
+→ FALSE-ALARM CHECK
+→ EVIDENCE
+→ ANALYST REVIEW
+→ PROVENANCE
+
+APPLICATION AREAS:
+1. Mission
+2. Discover
+3. Changes
+4. Review
+5. Similar Sites
+6. Archive
+7. Provenance
+
+MAIN DEMO:
+Query:
+"Show newly built structures near a river in the last 2 years"
+
+After pressing RUN:
+Show an animated analysis pipeline:
+
+QUERY RECEIVED
+INTENT PARSED
+AOI IDENTIFIED
+TIME WINDOW IDENTIFIED
+SEMANTIC SEARCH
+QUALITY FILTER
+TEMPORAL ANALYSIS
+EVIDENCE GENERATED
+
+Then show 87 candidates.
+
+Selecting Site #0147 opens:
+- satellite map
+- change bounding box
+- semantic score 94%
+- change confidence 92%
+- earliest supported date: Oct 2024
+- affected area: 2,840 m²
+- sensor: Sentinel-2
+
+Add a temporal slider:
+2023 → 2024 → 2025
+
+As it moves, change the imagery shown.
+
+Add an Evidence Stack:
+- semantic match
+- temporal persistence
+- spatial consistency
+- false-alarm check
+- sensor quality
+
+Add a False-Alarm Lab showing rejected signals:
+- cloud/haze
+- seasonal variation
+- river-stage change
+- mis-registration
+- sun angle
+
+Add Similar Sites:
+site cards with similarity percentages and thumbnails.
+
+Add analyst review:
+CONFIRM
+UNCERTAIN
+REJECT
+
+Store actions in an audit timeline.
+
+Add a Provenance panel with:
+scene IDs
+acquisition dates
+sensor
+processing steps
+model
+index
+valid pixel percentage
+
+Add an offline indicator:
+AIR-GAPPED ●
+NETWORK OFF
+LOCAL MODEL READY
+LOCAL INDEX READY
+
+Add a simulated "SIMULATE NETWORK LOSS" action.
+After clicking it:
+show:
+NETWORK DISCONNECTED
+SYSTEM OPERATIONAL
+semantic search ✓
+change analysis ✓
+review ✓
+provenance ✓
+
+TECHNICAL:
+Use plain HTML/CSS/JavaScript.
+No backend.
+Keep components modular.
+Use semantic HTML.
+Use CSS custom properties for design tokens.
+Use accessible controls.
+Use smooth but restrained animations.
+Use local JSON datasets.
+Use SVG for diagrams/graphs where useful.
+Use placeholder satellite images if real assets are not available yet.
+
+IMPORTANT INTERACTIONS:
+- search presets
+- query parsing animation
+- clickable search results
+- temporal slider
+- before/after comparison
+- evidence stack expand/collapse
+- similar site selection
+- analyst confirm/reject
+- provenance panel
+- offline simulation
+
+Create a convincing 90-second demo flow.
+
+Do not overpopulate the screen.
+The map should occupy approximately 45–50% of the main workspace.
+The rest should be evidence and analysis.
+
+Prioritize:
+1. Visual hierarchy
+2. Evidence workflow
+3. Temporal storytelling
+4. Analyst usability
+5. Technical credibility
+
+Do not make the application look like a generic GIS map viewer.
+```
+
+---
+
+# 34. Build order with Claude Code
+
+Don't ask Claude to build everything at once.
+
+### Phase 1
+
+```text
+App shell
++
+sidebar
++
+top status bar
++
+main map
++
+query composer
+```
+
+### Phase 2
+
+```text
+search animation
++
+candidate cards
++
+map markers
++
+filters
+```
+
+### Phase 3
+
+```text
+temporal slider
++
+before/after
++
+change trajectory
++
+confidence
+```
+
+### Phase 4
+
+```text
+Evidence Stack
++
+False Alarm Lab
++
+Evidence Graph
+```
+
+### Phase 5
+
+```text
+Similar Sites
++
+Review Queue
++
+Audit Trail
+```
+
+### Phase 6
+
+```text
+Provenance
++
+Offline simulation
++
+Incremental ingestion
+```
+
+This lets you get a compelling prototype very quickly before spending time on secondary screens.
+
+---
+
+# 35. Asset checklist for your prototype
+
+### Must-have
+
+```text
+□ 1 hero satellite AOI
+□ 4–6 historical images of same AOI
+□ 8–15 search result thumbnails
+□ 3 before/after examples
+□ 3 change heatmaps
+□ 3 false-alarm examples
+□ 1 river/water example
+□ 1 road-development example
+□ 1 construction example
+□ 1 land-clearance example
+□ map background
+□ site markers
+□ change polygons
+□ timeline graphics
+□ evidence icons
+□ sensor badges
+□ provenance icons
+```
+
+### Nice-to-have
+
+```text
+□ SAR image example
+□ Optical vs SAR comparison
+□ clustering visualization
+□ archive ingestion animation
+□ system telemetry
+□ processing pipeline animation
+□ evidence graph
+```
+
+---
+
+# 36. The three screens that matter most
+
+For the actual judging demo, spend **70% of your effort on these**:
+
+### 01 — Semantic Mission Search
+
+Judge immediately understands:
+
+> "This can search satellite imagery by meaning."
+
+### 02 — Temporal Change Studio
+
+Judge immediately understands:
+
+> "This doesn't just compare two images; it reasons across time."
+
+### 03 — Evidence Dossier
+
+Judge immediately understands:
+
+> "This doesn't blindly trust the model; it shows evidence and uncertainty."
+
+Everything else supports these three.
+
+---
+
+# 37. Your strongest positioning
+
+Your PPT currently says:
+
+> **From a simple question to an evidence-backed change report.** 
+
+I would turn that into the core product philosophy:
+
+# **ASK → FIND → PROVE**
+
+```text
+ASK
+Natural language
+or reference image
+
+↓
+
+FIND
+Semantic retrieval
++ temporal discovery
++ similar sites
+
+↓
+
+PROVE
+Change trajectory
++ false-alarm analysis
++ evidence
++ provenance
+```
+
+That is the story I'd build the entire prototype around.
+
+The research also supports the underlying technical direction: RemoteCLIP enables remote-sensing vision-language retrieval, CCDC provides continuous time-series change detection, and STAC provides a standardized way to represent and discover spatio-temporal EO assets. ([arXiv][3])
+
+One important benchmark-awareness point: the SIH problem requires a **reproducible evaluation report** covering indexed area, scene/tile count, build time, storage footprint, query latency and hardware, so I would make a small **“System Evidence”** drawer in the prototype even if the demo values are simulated. 
+
+### My recommendation for the prototype's central sentence
+
+> **“We don't show analysts where pixels changed. We show them where a change is supported by evidence.”**
+
+That should be the design principle behind the entire UI.
+
+[1]: https://worldview.earthdata.nasa.gov/?lg=false&t=2026-07-26-T08%3A39%3A32Z&utm_source=chatgpt.com "NASA Worldview"
+[2]: https://stacspec.org/en/about/stac-spec/?utm_source=chatgpt.com "The STAC Specification"
+[3]: https://arxiv.org/abs/2306.11029?utm_source=chatgpt.com "RemoteCLIP: A Vision Language Foundation Model for Remote Sensing"
+[4]: https://www.sciencedirect.com/science/article/pii/S0034425714000248?utm_source=chatgpt.com "Continuous change detection and classification of land cover using all available Landsat data - ScienceDirect"
+[5]: https://docs.qgis.org/3.34/pdf/en/QGIS-3.34-DesktopUserGuide-en.pdf?utm_source=chatgpt.com "QGIS Desktop 3.34 User Guide"
